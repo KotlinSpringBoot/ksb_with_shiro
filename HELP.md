@@ -1,0 +1,46 @@
+RBAC 是基于角色的访问控制（Role-Based Access Control ）在 RBAC 中，权限与角色相关联，用户通过成为适当角色的成员而得到这些角色的权限。这就极大地简化了权限的管理。这样管理都是层级相互依赖的，权限赋予给角色，而把角色又赋予用户，这样的权限设计很清楚，管理起来很方便。
+
+
+
+
+filterChainDefinitions参数说明,注意其验证顺序是自上而下
+    
+    =================================================================================================
+    anon        org.apache.shiro.web.filter.authc.AnonymousFilter
+    authc       org.apache.shiro.web.filter.authc.FormAuthenticationFilter
+    authcBasic  org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
+    perms       org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter
+    port        org.apache.shiro.web.filter.authz.PortFilter
+    rest        org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter
+    roles       org.apache.shiro.web.filter.authz.RolesAuthorizationFilter
+    ssl         org.apache.shiro.web.filter.authz.SslFilter
+    user        org.apache.shiro.web.filter.authc.UserFilter
+    =================================================================================================
+    anon: 例子/admins/**=anon 没有参数，表示可以匿名使用。
+    authc: 例如/admins/user/**=authc表示需要认证(登录)才能使用，没有参数
+
+    roles： 例子/admins/user/**=roles[admin],参数可以写多个，多个时必须加上引号，
+                    并且参数之间用逗号分割，当有多个参数时，例如admins/user/**=roles["admin,guest"],
+                    每个参数通过才算通过，相当于hasAllRoles()方法。
+    perms： 例子/admins/user/**=perms[user:add:*],参数可以写多个，多个时必须加上引号，并且参数之间用逗号分割，
+                    例如/admins/user/**=perms["user:add:*,user:modify:*"]，当有多个参数时必须每个参数都通过才通过，
+                    想当于isPermitedAll()方法。
+    rest：  例子/admins/user/**=rest[user],根据请求的方法，相当于/admins/user/**=perms[user:value] ,
+                   其中method为post，get，delete等。
+    port：  例子/admins/user/**=port[8081],当请求的url的端口不是8081是跳转到schemal://serverName:8081?queryString,
+                   其中schmal是协议http或https等，serverName是你访问的host,8081是url配置里port的端口，queryString是你访问的url里的？后面的参数。
+    authcBasic：例如/admins/user/**=authcBasic没有参数表示httpBasic认证
+    ssl:  例子/admins/user/**=ssl没有参数，表示安全的url请求，协议为https
+    user: 例如/admins/user/**=user没有参数表示必须存在用户，当登入操作时不做检查
+    注：anon，authcBasic，auchc，user是认证过滤器，
+    perms，roles，ssl，rest，port是授权过滤器
+
+
+
+http://blog.csdn.net/clj198606061111/article/details/24185023
+
+http://blog.csdn.net/frankcheng5143/article/details/50890118
+
+http://blog.csdn.net/catoop/article/details/50520958
+
+
